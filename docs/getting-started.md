@@ -20,7 +20,7 @@ AI systems that combine:
 - Git
 
 **API Keys**:
-- Anthropic API key (get free credits at console.anthropic.com)
+- Anthropic API key
 - LangSmith API key (optional, for LangGraph Studio debugging)
 
 ## Installation
