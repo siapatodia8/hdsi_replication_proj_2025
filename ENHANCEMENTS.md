@@ -2,15 +2,11 @@
 
 This document outlines the key changes made to the **workflow_agent.py**.
 
----
-
 ## 1. Added the “Explain Query” Step
 
 ### **Purpose**
 The new `explain_query` node generates a **human-readable explanation** of the Cypher query created by the model.  
 It helps users understand what the query is doing before or alongside execution.
-
----
 
 ### **Key Additions**
 
