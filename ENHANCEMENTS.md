@@ -71,6 +71,5 @@ workflow.add_edge("execute", "format")
  
 ### **Impact**
 
-Each question now produces both:
 - The workflow now runs the explain and execute steps simultaneously, reducing latency.
 - By returning only modified fields, the system avoids concurrent write conflicts, improving reliability and scalability.
