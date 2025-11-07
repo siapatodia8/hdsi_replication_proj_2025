@@ -1,6 +1,6 @@
 # Enhancements Summary
 
-This document outlines the key improvements made to the **workflow_agent.py** module in the biomedical LangGraph project.
+This document outlines the key changes made to the **workflow_agent.py**.
 
 ---
 
