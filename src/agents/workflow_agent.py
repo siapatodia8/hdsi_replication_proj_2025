@@ -25,6 +25,7 @@ class WorkflowState(TypedDict):
     results: Optional[List[Dict]]
     final_answer: Optional[str]
     error: Optional[str]
+    query_explanation: Optional[str] # explains cypher query in human readable terms
 
 
 class WorkflowAgent:
@@ -132,12 +133,14 @@ class WorkflowAgent:
         workflow.add_node("classify", self.classify_question)
         workflow.add_node("extract", self.extract_entities)
         workflow.add_node("generate", self.generate_query)
+        workflow.add_node("explain", self.explain_query)
         workflow.add_node("execute", self.execute_query)
         workflow.add_node("format", self.format_answer)
 
         workflow.add_edge("classify", "extract")
         workflow.add_edge("extract", "generate")
-        workflow.add_edge("generate", "execute")
+        workflow.add_edge("generate", "explain")
+        workflow.add_edge("explain", "execute")
         workflow.add_edge("execute", "format")
         workflow.add_edge("format", END)
 
@@ -316,6 +319,25 @@ Return only the Cypher query."""
 
         state["cypher_query"] = cypher_query
         return state
+    
+    def explain_query(self, state: WorkflowState) -> WorkflowState:
+        """Generate a human-readable explanation of the Cypher query."""
+        cypher_query = state.get("cypher_query")
+        if not cypher_query:
+            state["query_explanation"] = "No query generated for this question type."
+            return state
+
+        try:
+            prompt = (
+                "Explain in simple terms what this Cypher query does and what it will return. "
+                "Keep it to 3–5 sentences and avoid jargon.\n\n"
+                f"{cypher_query}"
+            )
+            # Give a little more room for a clear explanation
+            state["query_explanation"] = self._get_llm_response(prompt, max_tokens=180)
+        except Exception as e:
+            state["query_explanation"] = f"(Could not generate explanation: {e})"
+        return state
 
     def execute_query(self, state: WorkflowState) -> WorkflowState:
         """Execute the generated Cypher query against the database.
@@ -400,6 +422,7 @@ Make it concise and informative.""",
             results=None,
             final_answer=None,
             error=None,
+            query_explanation=None,
         )
 
         final_state = self.workflow.invoke(initial_state)
@@ -409,6 +432,7 @@ Make it concise and informative.""",
             "question_type": final_state.get("question_type"),
             "entities": final_state.get("entities", []),
             "cypher_query": final_state.get("cypher_query"),
+            "query_explanation": final_state.get("query_explanation"),
             "results_count": len(final_state.get("results", [])),
             "raw_results": final_state.get("results", [])[:3],
             "error": final_state.get("error"),
