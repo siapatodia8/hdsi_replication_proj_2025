@@ -35,13 +35,11 @@ It helps users understand what the query is doing before or alongside execution.
     - Mock response for explain_query
     - New assertion for "query_explanation" in the test result
 
-### ***Impact***
+### **Impact**
 
 Each question now produces both:
-    - A final answer (from the query results)
-    - A query explanation (plain-language description of the Cypher query)
-
-This improves transparency and interpretability of responses.
+- A query explanation (plain-language description of the Cypher query)
+- This improves transparency and interpretability of responses.
 
 ## 2. Parallelized “Explain Query” and “Execute Query” Steps
 
@@ -74,3 +72,9 @@ workflow.add_edge("execute", "format")
     - Combines both outputs into a single formatted final answer.
     - To prevent concurrent write conflicts, each node now returns only the fields it modifies.
     - This eliminates InvalidUpdateError caused by multiple nodes writing to the same key
+ 
+### **Impact**
+
+Each question now produces both:
+- The workflow now runs the explain and execute steps simultaneously, reducing latency.
+- By returning only modified fields, the system avoids concurrent write conflicts, improving reliability and scalability.
