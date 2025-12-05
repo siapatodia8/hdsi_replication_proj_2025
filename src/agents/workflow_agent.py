@@ -279,8 +279,8 @@ Provide a clear, informative answer about biomedical concepts.""",
             )
             return {"final_answer": answer}
 
-        results = state.get("results", None)          # None → execute not done yet
-        explanation = state.get("query_explanation")  # may arrive earlier or later
+        results = state.get("results", None)          
+        # explanation = state.get("query_explanation")  
 
         if results is None:
             # Not ready; produce no updates (prevents concurrent key conflicts)
@@ -289,8 +289,8 @@ Provide a clear, informative answer about biomedical concepts.""",
         if not results:
             msg = ("I didn't find any information for that question. "
                    "Try asking about genes, diseases, or drugs in our database.")
-            if explanation:
-                msg = f"**What the query does**: {explanation}\n\n{msg}"
+            # if explanation:
+            #     msg = f"**What the query does**: {explanation}\n\n{msg}"
             return {"final_answer": msg}
 
         answer_text = self._get_llm_response(
@@ -304,8 +304,8 @@ Make it concise and informative.""",
             max_tokens=250,
         )
 
-        if explanation:
-            answer_text = f"**What the query does**: {explanation}\n\n{answer_text}"
+        # if explanation:
+        #     answer_text = f"**What the query does**: {explanation}\n\n{answer_text}"
 
         return {"final_answer": answer_text}
 

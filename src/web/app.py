@@ -84,9 +84,35 @@ QUERY_EXAMPLES = {
     "Custom query": "",
 }
 
+HISTORY_FILE = Path("conversation_history.json")
+
+
+def save_history_to_file():
+    """Save conversation history to a JSON file."""
+    try:
+        history = st.session_state.conversation_history
+        with open(HISTORY_FILE, "w") as f:
+            json.dump(history, f, indent=2)
+    except Exception as e:
+
+        print(f"Warning: Could not save history to file: {e}")
+
+
+def load_history_from_file():
+    """Load conversation history from JSON file."""
+    try:
+        if HISTORY_FILE.exists():
+            with open(HISTORY_FILE, "r") as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Warning: Could not load history from file: {e}")
+    
+    # Return empty list if file doesn't exist or there's an error
+    return []
+
 # Initialize conversation history in session state
 if "conversation_history" not in st.session_state:
-    st.session_state.conversation_history = []
+    st.session_state.conversation_history = load_history_from_file()
 
 # Track session start time
 if "session_start_time" not in st.session_state:
@@ -118,10 +144,14 @@ def save_to_history(question: str, result: dict):
         question: The user's question
         result: The workflow agent's result dictionary
     """
+
+    answer_text = result.get("answer", "No answer generated")
+    # if "**What the query does**:" in answer_text:
+    #     answer_text = answer_text.split("\n\n", 1)[-1]
     conversation = {
         "timestamp": datetime.now().isoformat(),
         "question": question,
-        "answer": result.get("answer", "No answer generated"),
+        "answer": answer_text,
         "question_type": result.get("question_type", "unknown"),
         "entities": result.get("entities", []),
         "cypher_query": result.get("cypher_query", ""),
@@ -139,6 +169,8 @@ def save_to_history(question: str, result: dict):
         st.session_state.conversation_history = (
             st.session_state.conversation_history[:max_history]
         )
+    
+    save_history_to_file()
 
 
 def display_conversation_history():
@@ -586,8 +618,8 @@ def main_interface(workflow_agent, graph_interface):
                 st.subheader("Final Answer")
 
                 answer_text = result["answer"]
-                if "**What the query does**:" in answer_text:
-                    answer_text = answer_text.split("\n\n", 1)[-1]
+                # if "**What the query does**:" in answer_text:
+                #     answer_text = answer_text.split("\n\n", 1)[-1]
         
                 st.info(answer_text)
 
@@ -674,6 +706,7 @@ def display_sidebar():
             # Clear history button
             if st.button("🗑️ Clear History", use_container_width=True):
                 st.session_state.conversation_history = []
+                save_history_to_file()
                 st.rerun()
         
         with col2:
