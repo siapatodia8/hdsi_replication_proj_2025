@@ -390,13 +390,14 @@ def display_learning_workflow_steps():
 
     st.markdown("---")
 
-    st.markdown("**Our Agent's 5-Step Process:**")
+    st.markdown("**Our Agent's 6-Step Process:**")
 
     steps = [
         ("1. Classify", "Determine what type of question this is"),
         ("2. Extract", "Find key terms like gene names or diseases"),
         ("3. Generate", "Build a database query based on the question"),
-        ("4. Execute", "Run the query and get results"),
+        ("4a. Explain", "Generate human-readable explanation (runs in parallel)"),
+        ("4b. Execute", "Run the query and get results (runs in parallel)"),
         ("5. Format", "Turn database results into a readable answer"),
     ]
 
@@ -576,9 +577,19 @@ def main_interface(workflow_agent, graph_interface):
                     st.subheader("Generated Query")
                     if result["cypher_query"]:
                         st.code(result["cypher_query"], language="cypher")
+                
+                if result.get("query_explanation"):
+                    st.subheader("Query Explanation")
+                    st.info(result["query_explanation"])
+                    st.caption("This explanation was generated in parallel with query execution for faster results")
 
                 st.subheader("Final Answer")
-                st.info(result["answer"])
+
+                answer_text = result["answer"]
+                if "**What the query does**:" in answer_text:
+                    answer_text = answer_text.split("\n\n", 1)[-1]
+        
+                st.info(answer_text)
 
                 # Show raw results
                 if result.get("raw_results"):
