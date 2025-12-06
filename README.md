@@ -6,6 +6,8 @@ An interactive educational project that teaches modern AI development through ha
 
 *Navigate: [Getting Started](docs/getting-started.md) | [Foundations Guide](docs/foundations-and-background.md) | [Reference](docs/reference.md) | [Technical Guide](docs/technical-guide.md)*
 
+[ENHANCEMENTS.md](ENHANCEMENTS.md) outlines the key improvements made to the workflow_agent.py and app.py modules in the biomedical LangGraph project.
+
 
 ## What You'll Learn
 
